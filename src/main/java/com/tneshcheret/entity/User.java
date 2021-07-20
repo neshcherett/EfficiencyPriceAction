@@ -1,32 +1,32 @@
 package com.tneshcheret.entity;
 
 public class User extends BaseEntity {
-    private String login;
+    private String userName;
     private String password;
     private UserRole userRole;
 
     public User() {
     }
 
-    public User(String login, String password, UserRole userRole) {
-        this.login = login;
+    public User(String userName, String password, UserRole userRole) {
+        this.userName = userName;
         this.password = password;
         this.userRole = userRole;
     }
 
-    public User(Integer id, String login, String password, UserRole userRole) {
+    public User(Integer id, String userName, String password, UserRole userRole) {
         super(id);
-        this.login = login;
+        this.userName = userName;
         this.password = password;
         this.userRole = userRole;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {
@@ -48,7 +48,7 @@ public class User extends BaseEntity {
     @Override
     public String toString() {
         return "User{" +
-                "login='" + login + '\'' +
+                "login='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", userRole=" + userRole +
                 '}';

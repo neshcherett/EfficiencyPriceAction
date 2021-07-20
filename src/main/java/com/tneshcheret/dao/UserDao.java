@@ -23,7 +23,7 @@ public class UserDao {
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id_user"));
-                user.setLogin(resultSet.getString("login"));
+                user.setUserName(resultSet.getString("login"));
                 user.setPassword(resultSet.getString("password"));
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 users.add(user);
@@ -42,7 +42,7 @@ public class UserDao {
             if (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id_user"));
-                user.setLogin(resultSet.getString("login"));
+                user.setUserName(resultSet.getString("login"));
                 user.setPassword(resultSet.getString("password"));
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 return user;
@@ -61,7 +61,7 @@ public class UserDao {
             if (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt("id_user"));
-                user.setLogin(resultSet.getString("login"));
+                user.setUserName(resultSet.getString("login"));
                 user.setPassword(resultSet.getString("password"));
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 return user;
@@ -85,7 +85,7 @@ public class UserDao {
     public Integer create(User user) throws DaoException {
         try (Connection connection = PostgresUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, user.getLogin());
+            preparedStatement.setString(1, user.getUserName());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, String.valueOf(user.getUserRole()));
             return preparedStatement.executeUpdate();

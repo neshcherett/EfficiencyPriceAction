@@ -8,12 +8,11 @@ public class UserService {
 
     private UserDao userDao = new UserDao();
 
-    public User getByUserName(String login) {
+    public User findByUserName(String login) throws ServiceException {
         try {
             return userDao.findByLogin(login);
-        } catch (Exception e) {//TODO Exception
-            System.out.println("Failed to find");
-            return null;
+        } catch (Exception e) {
+            throw new ServiceException("Failed to find user by login");
         }
     }
 }
