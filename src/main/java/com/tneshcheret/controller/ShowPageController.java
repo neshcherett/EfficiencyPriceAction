@@ -15,4 +15,5 @@ public class ShowPageController implements Controller {
     public ControllerResultDto execute(HttpServletRequest request, HttpServletResponse response) {
         return new ControllerResultDto(VIEW_NAME);
     }
+
 }

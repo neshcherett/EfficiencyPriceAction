@@ -1,12 +1,11 @@
 package com.tneshcheret.dao;
 
-import com.tneshcheret.entity.MethodGrantingDiscount;
-import com.tneshcheret.entity.RequestAction;
+import com.tneshcheret.entity.*;
 import com.tneshcheret.utils.PostgresUtils;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 public class RequestActionDao {
 
@@ -23,19 +22,21 @@ public class RequestActionDao {
             "inner join retail_chains on request_action.retail_chain_id = retail_chains.id_retail_chains " +
             "inner join region on retail_chains.region_id = region.id_region";
 
-    private static final String SELECT_BY_ID = "select id_request_action," +
+    private static final String SELECT_BY_ID_USER = "select id_request_action," +
             "retail_chain_id, " +
             "product_id, " +
             "start_date, " +
             "end_date, " +
             "discount, " +
             "method_discount, " +
-            "action_cost " +
+            "action_cost, " +
+            "request_action.id_user " +
             "from request_action " +
             "inner join product on request_action.product_id = product.id_product " +
             "inner join retail_chains on request_action.retail_chain_id = retail_chains.id_retail_chains " +
             "inner join region on retail_chains.region_id = region.id_region " +
-            "where id_request_action = ?";
+            "inner join \"user\" on request_action.id_user = \"user\".id_user " +
+            "where request_action.id_user = ?";
 
     private static final String INSERT_SQL = "insert into request_action( retail_chain_id, " +
             "product_id, " +
@@ -43,79 +44,77 @@ public class RequestActionDao {
             "end_date, " +
             "discount, " +
             "method_discount, " +
-            "action_cost) " +
-            "values (?, ?, ?, ?, ?, ?, ?)";
+            "action_cost, " +
+            "id_user) " +
+            "values (?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String DELETE_BY_ID = "delete from request_action where id_request_action = ?";
 
-    public List<RequestAction> findAll() throws DaoException {
-        List<RequestAction> requestActions = new ArrayList<>();
-        try (Connection connection = PostgresUtils.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
-            while (resultSet.next()) {
-                RequestAction requestAction = new RequestAction();
-                requestAction.setId(resultSet.getInt("id_request_action"));
-                requestAction.setRetailChain(new RetailChainDao().getById(resultSet.getInt("retail_chain_id")));
-                requestAction.setProduct(new ProductDao().getById(resultSet.getInt("product_id")));
-                requestAction.setStartDate(resultSet.getDate("start_date").toLocalDate());
-                requestAction.setEndDate(resultSet.getDate("end_date").toLocalDate());
-                requestAction.setDiscount(resultSet.getDouble("discount"));
-                requestAction.setMethodGrantingDiscount(MethodGrantingDiscount.valueOf(resultSet.getString("method_discount")));
-                requestAction.setCostAction(resultSet.getInt("action_cost"));
-                requestActions.add(requestAction);
-            }
-        } catch (SQLException throwables) {
-            throw new DaoException("Failed findAll RequestActions");
-        }
-        return requestActions;
-    }
 
-    public RequestAction getById(Integer id) throws DaoException {
+    public RequestAction getById(User user) throws DaoException {
         try (Connection connection = PostgresUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
-            preparedStatement.setInt(1, id);
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_USER)) {
+
+            preparedStatement.setInt(1, user.getId());
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                RequestAction requestAction = new RequestAction();
-                requestAction.setId(resultSet.getInt("id_request_action"));
-                requestAction.setRetailChain(new RetailChainDao().getById(resultSet.getInt("retail_chain_id")));
-                requestAction.setProduct(new ProductDao().getById(resultSet.getInt("product_id")));
-                requestAction.setStartDate(resultSet.getDate("start_date").toLocalDate());
-                requestAction.setEndDate(resultSet.getDate("end_date").toLocalDate());
-                requestAction.setDiscount(resultSet.getDouble("discount"));
-                requestAction.setMethodGrantingDiscount(MethodGrantingDiscount.valueOf(resultSet.getString("method_discount")));
-                requestAction.setCostAction(resultSet.getInt("action_cost"));
-                return requestAction;
+
+            ArrayList<Product> products = new ArrayList<>();
+
+            while (resultSet.next()) {
+
+                int requestActionId = resultSet.getInt("id_request_action");
+                RetailChain retailChain = new RetailChainDao().getById(resultSet.getInt("retail_chain_id"));
+                LocalDate startDate = resultSet.getDate("start_date").toLocalDate();
+                LocalDate endDate = resultSet.getDate("end_date").toLocalDate();
+                double discount = resultSet.getDouble("discount");
+                MethodGrantingDiscount methodGrantingDiscount = MethodGrantingDiscount.valueOf(resultSet.getString("method_discount"));
+                int cost = resultSet.getInt("action_cost");
+                Product product = new ProductDao().getById(resultSet.getInt("product_id"));
+
+                products.add(product);
             }
-        } catch (SQLException throwables) {
+
+            return RequestAction.newBuilder()
+                    .setUser(user)
+                    .setProduct(products)
+                    .build();
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById RequestAction");
         }
-        return null;
     }
 
-    public Integer create(RequestAction requestAction) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setInt(1, requestAction.getRetailChain().getId());
-            preparedStatement.setInt(2, requestAction.getProduct().getId());
-            preparedStatement.setDate(3, Date.valueOf(requestAction.getStartDate()));
-            preparedStatement.setDate(4, Date.valueOf(requestAction.getEndDate()));
-            preparedStatement.setDouble(5, requestAction.getDiscount());
-            preparedStatement.setString(6, String.valueOf(requestAction.getMethodGrantingDiscount()));
-            preparedStatement.setInt(7, requestAction.getCostAction());
-            return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+    public RequestAction createOrUpdate(RequestAction requestAction) throws DaoException {
+        deleteRequestAction(requestAction);
+        try {
+            for (Product product : requestAction.getProducts()) {
+                try (Connection connection = PostgresUtils.getConnection();
+                     PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
+
+                    preparedStatement.setInt(1,1);//TODO убрать заглушку
+                    preparedStatement.setInt(2, product.getId());
+                    preparedStatement.setDate(3, Date.valueOf(LocalDate.of(2021,8,25)));//TODO убрать заглушку
+                    preparedStatement.setDate(4, Date.valueOf(LocalDate.of(2021,8,25)));//TODO убрать заглушку
+                    preparedStatement.setDouble(5, 0.15);//TODO убрать заглушку
+                    preparedStatement.setString(6, String.valueOf(MethodGrantingDiscount.ONINVOICE));//TODO убрать заглушку
+                    preparedStatement.setInt(7, requestAction.getCostAction());//TODO убрать заглушку
+                    preparedStatement.setInt(8, requestAction.getUser().getId());
+
+                    preparedStatement.execute();
+                }
+            }
+            return requestAction;
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create RequestAction");
         }
     }
 
-    public void deleteById(Integer id) throws DaoException {
+    public void deleteRequestAction(RequestAction requestAction) throws DaoException {
         try (Connection connection = PostgresUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, requestAction.getUser().getId());
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById RequestAction");
         }
     }

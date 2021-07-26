@@ -1,30 +1,24 @@
 package com.tneshcheret.entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class RequestAction extends BaseEntity {
     private RetailChain retailChain;
-    private Product product;
+    private List<Product> products;
     private LocalDate startDate;
     private LocalDate endDate;
     private double discount;
     private MethodGrantingDiscount methodGrantingDiscount;
     private int costAction;
+    private User user;
+    private Integer id;
 
-    public RequestAction() {
+    private RequestAction() {
     }
 
-    public RequestAction(RetailChain retailChain, Product product, LocalDate startDate, LocalDate endDate, double discount, MethodGrantingDiscount methodGrantingDiscount, int costAction) {
-        this.retailChain = retailChain;
-        this.product = product;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.discount = discount;
-        this.methodGrantingDiscount = methodGrantingDiscount;
-        this.costAction = costAction;
+    public static Builder newBuilder() {
+        return new RequestAction().new Builder();
     }
 
     public RetailChain getRetailChain() {
@@ -35,64 +29,104 @@ public class RequestAction extends BaseEntity {
         this.retailChain = retailChain;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
+    public List<Product> getProducts() {
+        return products;
     }
 
     public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
     public LocalDate getEndDate() {
         return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
     }
 
     public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
-
     public MethodGrantingDiscount getMethodGrantingDiscount() {
         return methodGrantingDiscount;
-    }
-
-    public void setMethodGrantingDiscount(MethodGrantingDiscount methodGrantingDiscount) {
-        this.methodGrantingDiscount = methodGrantingDiscount;
     }
 
     public int getCostAction() {
         return costAction;
     }
 
-    public void setCostAction(int costAction) {
-        this.costAction = costAction;
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
     }
 
     @Override
     public String toString() {
         return "RequestAction{" +
                 "retailChain=" + retailChain +
-                ", product=" + product +
+                ", product=" + products +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", discount=" + discount +
                 ", methodGrantingDiscount=" + methodGrantingDiscount +
                 ", costAction=" + costAction +
                 '}';
+    }
+
+    public class Builder {
+
+        private Builder() {
+        }
+
+        public Builder setRetailChain(RetailChain retailChain) {
+            RequestAction.this.retailChain = retailChain;
+            return this;
+        }
+
+        public Builder setProduct(List<Product> products) {
+            RequestAction.this.products = products;
+            return this;
+        }
+
+        public Builder setStartDate(LocalDate startDate) {
+            RequestAction.this.startDate = startDate;
+            return this;
+        }
+
+        public Builder setEndDate(LocalDate endDate) {
+            RequestAction.this.endDate = endDate;
+            return this;
+        }
+
+        public Builder setDiscount(double discount) {
+            RequestAction.this.discount = discount;
+            return this;
+        }
+
+        public Builder setMethodGrantingDiscount(MethodGrantingDiscount methodGrantingDiscount) {
+            RequestAction.this.methodGrantingDiscount = methodGrantingDiscount;
+            return this;
+        }
+
+        public Builder setCostAction(int costAction) {
+            RequestAction.this.costAction = costAction;
+            return this;
+        }
+
+        public Builder setUser(User user) {
+            RequestAction.this.user = user;
+            return this;
+        }
+
+        public Builder setId(Integer id) {
+            RequestAction.this.id = id;
+            return this;
+        }
+
+        public RequestAction build() {
+            return RequestAction.this;
+        }
     }
 }

@@ -25,7 +25,7 @@ public class RegionDao {
                 region.setName(resultSet.getString("name_region"));
                 regions.add(region);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll Regions");
         }
         return regions;
@@ -42,7 +42,7 @@ public class RegionDao {
                 region.setName(resultSet.getString("name_region"));
                 return region;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById Region");
         }
         return null;
@@ -53,7 +53,7 @@ public class RegionDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById Region");
         }
     }
@@ -63,7 +63,7 @@ public class RegionDao {
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, region.getName());
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create Region");
         }
     }

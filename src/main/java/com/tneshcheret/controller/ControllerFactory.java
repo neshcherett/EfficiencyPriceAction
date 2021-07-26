@@ -13,6 +13,8 @@ public class ControllerFactory {
         controllerMap.put("GET/login", new ShowPageController("login"));
         controllerMap.put("GET/main", new ShowPageController("main"));
         controllerMap.put("GET/products", new ShowAllProductController());
+        controllerMap.put("GET/requestAction", new ShowRequestActionController());
+        controllerMap.put("GET/addToRequest", new AddToRequestActionController());
 
         controllerMap.put("POST/login", new LoginController());
     }

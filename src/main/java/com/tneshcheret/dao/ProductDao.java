@@ -36,11 +36,14 @@ public class ProductDao {
 
 
     public List<Product> findAll() throws DaoException {
+
         List<Product> products = new ArrayList<>();
+
         try (Connection connection = PostgresUtils.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)
         ) {
+
             while (resultSet.next()) {
                 Product product = new Product();
                 product.setName(resultSet.getString("name_product"));
@@ -50,7 +53,7 @@ public class ProductDao {
                 product.setId(resultSet.getInt("id_product"));
                 products.add(product);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll Products");
         }
         return products;
@@ -63,8 +66,9 @@ public class ProductDao {
             preparedStatement.setInt(2, product.getBrandPackage().getId());
             preparedStatement.setDouble(3, product.getPrimeCost());
             preparedStatement.setDouble(4, product.getPrice());
+
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create Product");
         }
     }
@@ -74,6 +78,7 @@ public class ProductDao {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 Product product = new Product();
                 product.setId(resultSet.getInt("id_product"));
@@ -81,10 +86,11 @@ public class ProductDao {
                 product.setBrandPackage(new BrandPackage(resultSet.getInt("brand_package_id"), resultSet.getString("name_brand_package")));
                 product.setPrimeCost(resultSet.getDouble("prime_cost"));
                 product.setPrice(resultSet.getDouble("price"));
+
                 return product;
             }
 
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById Product");
         }
         return null;
@@ -95,7 +101,7 @@ public class ProductDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteByID Product");
         }
     }

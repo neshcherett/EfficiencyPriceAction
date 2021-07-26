@@ -15,7 +15,9 @@ public class BrandPackageDao {
     private static final String INSERT_SQL = "insert into brand_package (name_brand_package) values ( ?)";
 
     public List<BrandPackage> findAll() throws DaoException {
+
         List<BrandPackage> brandPackages = new ArrayList<>();
+
         try (Connection connection = PostgresUtils.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
@@ -25,7 +27,7 @@ public class BrandPackageDao {
                 brandPackage.setName(resultSet.getString("name_brand_package"));
                 brandPackages.add(brandPackage);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll BrandPackages");
         }
         return brandPackages;
@@ -36,13 +38,15 @@ public class BrandPackageDao {
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 BrandPackage brandPackage = new BrandPackage();
                 brandPackage.setName(resultSet.getString("name_brand_package"));
                 brandPackage.setId(resultSet.getInt("id_brand_package"));
+
                 return brandPackage;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById BrandPackage");
         }
         return null;
@@ -53,7 +57,7 @@ public class BrandPackageDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById BrandPackage");
         }
     }
@@ -63,7 +67,7 @@ public class BrandPackageDao {
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, brandPackage.getName());
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create BrandPackage");
         }
     }

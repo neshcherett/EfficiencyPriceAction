@@ -9,7 +9,8 @@ public class PostgresUtils {
     private static final String USER = "postgres";
     private static final String PASSWORD = "password";
 
-    public static Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException, ClassNotFoundException {
+        Class.forName("org.postgresql.Driver");
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

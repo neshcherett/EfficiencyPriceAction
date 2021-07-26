@@ -45,7 +45,7 @@ public class RetailChainDao {
                 retailChain.setRegion(new Region((resultSet.getInt("region_id")), resultSet.getString("name_region")));
                 retailChains.add(retailChain);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll RetailChains");
         }
         return retailChains;
@@ -58,7 +58,7 @@ public class RetailChainDao {
             preparedStatement.setInt(2, retailChain.getRegion().getId());
             preparedStatement.setDouble(3, retailChain.getCommercialTerms());
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create RetailChain");
         }
     }
@@ -76,7 +76,7 @@ public class RetailChainDao {
                 retailChain.setCommercialTerms(resultSet.getDouble("commercial_terms"));
                 return retailChain;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById RetailChain");
         }
         return null;
@@ -87,7 +87,7 @@ public class RetailChainDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteByID RetailChain");
         }
     }

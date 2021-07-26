@@ -17,10 +17,10 @@ public class LoginController implements Controller {
         String userName = request.getParameter("userName");
         String password = request.getParameter("password");
 
-        User user = userService.findByUserName(userName);
+        User user = userService.getByUserName(userName);
 
         if (user.getPassword().equals(password)) {
-            request.setAttribute("userName", user);
+            request.setAttribute("user", user);
 
             HttpSession session = request.getSession();
             session.setAttribute("userId", user.getId());

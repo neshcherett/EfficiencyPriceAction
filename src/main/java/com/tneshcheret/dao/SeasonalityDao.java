@@ -43,7 +43,7 @@ public class SeasonalityDao {
                 seasonality.setCoefficient(resultSet.getDouble("coefficient"));
                 seasonalities.add(seasonality);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll Seasonality");
         }
         return seasonalities;
@@ -62,7 +62,7 @@ public class SeasonalityDao {
                 seasonality.setCoefficient(resultSet.getDouble("coefficient"));
                 return seasonality;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById Seasonality");
         }
         return null;
@@ -73,7 +73,7 @@ public class SeasonalityDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById Seasonality");
         }
     }
@@ -85,7 +85,7 @@ public class SeasonalityDao {
             preparedStatement.setInt(2, seasonality.getBrandPackage().getId());
             preparedStatement.setDouble(3, seasonality.getCoefficient());
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create Seasonality");
         }
     }

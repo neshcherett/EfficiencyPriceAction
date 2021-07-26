@@ -44,6 +44,7 @@ public class LogisticDao {
         try (Connection connection = PostgresUtils.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
+
             while (resultSet.next()) {
                 Logistic logistic = new Logistic();
                 logistic.setBrandPackage(new BrandPackage(resultSet.getInt("brand_package_id"), resultSet.getString("name_brand_package")));
@@ -52,7 +53,7 @@ public class LogisticDao {
                 logistic.setDeliveryCost(resultSet.getDouble("delivery_cost"));
                 logistics.add(logistic);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll Logistics");
         }
         return logistics;
@@ -63,15 +64,17 @@ public class LogisticDao {
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 Logistic logistic = new Logistic();
                 logistic.setId(resultSet.getInt("id_logistic"));
                 logistic.setRegion(new Region(resultSet.getInt("region_id"), resultSet.getString("name_region")));
                 logistic.setBrandPackage(new BrandPackage(resultSet.getInt("brand_package_id"), resultSet.getString("name_brand_package")));
                 logistic.setDeliveryCost(resultSet.getDouble("delivery_cost"));
+
                 return logistic;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById Logistic");
         }
         return null;
@@ -83,8 +86,9 @@ public class LogisticDao {
             preparedStatement.setInt(1, logistic.getRegion().getId());
             preparedStatement.setInt(2, logistic.getBrandPackage().getId());
             preparedStatement.setDouble(3, logistic.getDeliveryCost());
+
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create Logistic");
         }
     }
@@ -94,7 +98,7 @@ public class LogisticDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById Logistic");
         }
     }

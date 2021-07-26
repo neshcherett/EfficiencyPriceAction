@@ -6,23 +6,6 @@ create table brand
 	name varchar not null
 );
 
-alter table brand owner to postgres;
-
-create table car
-(
-	id serial not null
-		constraint car_pkey
-			primary key,
-	brandid integer
-		constraint car_brandid_fkey
-			references brand,
-	color varchar not null,
-	createdate date not null,
-	price integer
-);
-
-alter table car owner to postgres;
-
 create table region
 (
 	id_region serial not null
@@ -31,8 +14,6 @@ create table region
 	name_region varchar
 );
 
-alter table region owner to postgres;
-
 create table brand_package
 (
 	id_brand_package serial not null
@@ -40,8 +21,6 @@ create table brand_package
 			primary key,
 	name_brand_package varchar
 );
-
-alter table brand_package owner to postgres;
 
 create table retail_chains
 (
@@ -54,8 +33,6 @@ create table retail_chains
 			references region,
 	commercial_terms double precision
 );
-
-alter table retail_chains owner to postgres;
 
 create table product
 (
@@ -70,8 +47,6 @@ create table product
 	price numeric(2)
 );
 
-alter table product owner to postgres;
-
 create table logistic
 (
 	id_logistic serial not null
@@ -85,8 +60,6 @@ create table logistic
 			references brand_package,
 	delivery_cost double precision
 );
-
-alter table logistic owner to postgres;
 
 create table request_action
 (
@@ -106,8 +79,6 @@ create table request_action
 	action_cost integer
 );
 
-alter table request_action owner to postgres;
-
 create table seasonality
 (
 	id_seasonality serial not null
@@ -120,8 +91,6 @@ create table seasonality
 	coefficient double precision
 );
 
-alter table seasonality owner to postgres;
-
 create table "user"
 (
 	id_user serial not null
@@ -131,17 +100,3 @@ create table "user"
 	password varchar,
 	user_role varchar
 );
-
-alter table "user" owner to postgres;
-
-create table note
-(
-	id serial not null
-		constraint note_pkey
-			primary key,
-	description varchar not null,
-	created_time timestamp not null
-);
-
-alter table note owner to postgres;
-

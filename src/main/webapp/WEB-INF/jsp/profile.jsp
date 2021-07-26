@@ -10,9 +10,10 @@
 <p>Id : ${user.id}</p>
 <p>Name : ${user.userName}</p>
 <p>Password : ${user.password}</p>
+<p>Role : ${user.userRole}</p>
 
 <a href="products">view all products</a>
-<a href="basket">view my request action</a>
+<a href="requestAction">view my request action</a>
 
 </body>
 </html>

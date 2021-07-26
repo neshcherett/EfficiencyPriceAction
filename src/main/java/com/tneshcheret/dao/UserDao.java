@@ -28,7 +28,7 @@ public class UserDao {
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 users.add(user);
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findAll Users");
         }
         return users;
@@ -47,15 +47,15 @@ public class UserDao {
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 return user;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed getById User");
         }
         return null;
     }
 
-    public User findByLogin(String login) throws DaoException {
+    public User getByLogin(String login) throws DaoException {
         try (Connection connection = PostgresUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_LOGIN)) {
             preparedStatement.setString(1, login);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -66,7 +66,7 @@ public class UserDao {
                 user.setUserRole(UserRole.valueOf((resultSet.getString("user_role"))));
                 return user;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed findByLogin User");
         }
         return null;
@@ -77,7 +77,7 @@ public class UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed deleteById User");
         }
     }
@@ -89,7 +89,7 @@ public class UserDao {
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, String.valueOf(user.getUserRole()));
             return preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throw new DaoException("Failed create User");
         }
     }
