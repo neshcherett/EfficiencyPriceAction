@@ -2,7 +2,8 @@ package com.tneshcheret.dao;
 
 import com.tneshcheret.entity.BrandPackage;
 import com.tneshcheret.entity.Product;
-import com.tneshcheret.utils.PostgresUtils;
+import com.tneshcheret.utils.ConnectionPool;
+import com.tneshcheret.utils.MySpecialContext;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -37,9 +38,11 @@ public class ProductDao {
 
     public List<Product> findAll() throws DaoException {
 
+        ConnectionPool connectionPool = MySpecialContext.get();
+
         List<Product> products = new ArrayList<>();
 
-        try (Connection connection = PostgresUtils.getConnection();
+        try (Connection connection = connectionPool.get();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)
         ) {
@@ -53,14 +56,18 @@ public class ProductDao {
                 product.setId(resultSet.getInt("id_product"));
                 products.add(product);
             }
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed findAll Products");
         }
+
         return products;
     }
 
     public Integer create(Product product) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, product.getName());
             preparedStatement.setInt(2, product.getBrandPackage().getId());
@@ -68,13 +75,16 @@ public class ProductDao {
             preparedStatement.setDouble(4, product.getPrice());
 
             return preparedStatement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed create Product");
         }
     }
 
     public Product getById(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -90,18 +100,21 @@ public class ProductDao {
                 return product;
             }
 
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed getById Product");
         }
         return null;
     }
 
     public void deleteByID(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed deleteByID Product");
         }
     }

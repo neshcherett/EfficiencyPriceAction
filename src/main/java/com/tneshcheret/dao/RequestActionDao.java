@@ -1,7 +1,8 @@
 package com.tneshcheret.dao;
 
 import com.tneshcheret.entity.*;
-import com.tneshcheret.utils.PostgresUtils;
+import com.tneshcheret.utils.ConnectionPool;
+import com.tneshcheret.utils.MySpecialContext;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -52,7 +53,10 @@ public class RequestActionDao {
 
 
     public RequestAction getById(User user) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_USER)) {
 
             preparedStatement.setInt(1, user.getId());
@@ -78,22 +82,27 @@ public class RequestActionDao {
                     .setUser(user)
                     .setProduct(products)
                     .build();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed getById RequestAction");
         }
     }
 
     public RequestAction createOrUpdate(RequestAction requestAction) throws DaoException {
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
         deleteRequestAction(requestAction);
+
         try {
+
             for (Product product : requestAction.getProducts()) {
-                try (Connection connection = PostgresUtils.getConnection();
+                try (Connection connection = connectionPool.get();
                      PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
 
-                    preparedStatement.setInt(1,1);//TODO убрать заглушку
+                    preparedStatement.setInt(1, 1);//TODO убрать заглушку
                     preparedStatement.setInt(2, product.getId());
-                    preparedStatement.setDate(3, Date.valueOf(LocalDate.of(2021,8,25)));//TODO убрать заглушку
-                    preparedStatement.setDate(4, Date.valueOf(LocalDate.of(2021,8,25)));//TODO убрать заглушку
+                    preparedStatement.setDate(3, Date.valueOf(LocalDate.of(2021, 8, 25)));//TODO убрать заглушку
+                    preparedStatement.setDate(4, Date.valueOf(LocalDate.of(2021, 8, 25)));//TODO убрать заглушку
                     preparedStatement.setDouble(5, 0.15);//TODO убрать заглушку
                     preparedStatement.setString(6, String.valueOf(MethodGrantingDiscount.ONINVOICE));//TODO убрать заглушку
                     preparedStatement.setInt(7, requestAction.getCostAction());//TODO убрать заглушку
@@ -102,19 +111,22 @@ public class RequestActionDao {
                     preparedStatement.execute();
                 }
             }
+
             return requestAction;
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed create RequestAction");
         }
     }
 
     public void deleteRequestAction(RequestAction requestAction) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, requestAction.getUser().getId());
             preparedStatement.execute();
-
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed deleteById RequestAction");
         }
     }

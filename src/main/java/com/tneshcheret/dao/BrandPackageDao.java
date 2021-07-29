@@ -1,7 +1,8 @@
 package com.tneshcheret.dao;
 
 import com.tneshcheret.entity.BrandPackage;
-import com.tneshcheret.utils.PostgresUtils;
+import com.tneshcheret.utils.ConnectionPool;
+import com.tneshcheret.utils.MySpecialContext;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,25 +17,32 @@ public class BrandPackageDao {
 
     public List<BrandPackage> findAll() throws DaoException {
 
+        ConnectionPool connectionPool = MySpecialContext.get();
+
         List<BrandPackage> brandPackages = new ArrayList<>();
 
-        try (Connection connection = PostgresUtils.getConnection();
+        try (Connection connection = connectionPool.get();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
+
             while (resultSet.next()) {
                 BrandPackage brandPackage = new BrandPackage();
                 brandPackage.setId(resultSet.getInt("id_brand_package"));
                 brandPackage.setName(resultSet.getString("name_brand_package"));
                 brandPackages.add(brandPackage);
             }
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed findAll BrandPackages");
         }
+
         return brandPackages;
     }
 
     public BrandPackage getById(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -46,28 +54,35 @@ public class BrandPackageDao {
 
                 return brandPackage;
             }
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed getById BrandPackage");
         }
         return null;
     }
 
     public void deleteById(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed deleteById BrandPackage");
         }
     }
 
-    public Integer create(BrandPackage brandPackage) throws DaoException{
-        try (Connection connection = PostgresUtils.getConnection();
+    public Integer create(BrandPackage brandPackage) throws DaoException {
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, brandPackage.getName());
+
             return preparedStatement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed create BrandPackage");
         }
     }

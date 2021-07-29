@@ -2,7 +2,8 @@ package com.tneshcheret.dao;
 
 import com.tneshcheret.entity.BrandPackage;
 import com.tneshcheret.entity.Seasonality;
-import com.tneshcheret.utils.PostgresUtils;
+import com.tneshcheret.utils.ConnectionPool;
+import com.tneshcheret.utils.MySpecialContext;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,10 +32,15 @@ public class SeasonalityDao {
     private static final String INSERT_SQL = "insert into seasonality (month, brand_package_id, coefficient) VALUES (?, ?, ?)";
 
     public List<Seasonality> findAll() throws DaoException {
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
         List<Seasonality> seasonalities = new ArrayList<>();
-        try (Connection connection = PostgresUtils.getConnection();
+
+        try (Connection connection = connectionPool.get();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SELECT_ALL)) {
+
             while (resultSet.next()) {
                 Seasonality seasonality = new Seasonality();
                 seasonality.setId(resultSet.getInt("id_seasonality"));
@@ -43,49 +49,64 @@ public class SeasonalityDao {
                 seasonality.setCoefficient(resultSet.getDouble("coefficient"));
                 seasonalities.add(seasonality);
             }
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed findAll Seasonality");
         }
+
         return seasonalities;
     }
 
     public Seasonality getById(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 Seasonality seasonality = new Seasonality();
                 seasonality.setId(resultSet.getInt("id_seasonality"));
                 seasonality.setMonthNumber(resultSet.getInt("month"));
                 seasonality.setBrandPackage(new BrandPackage(resultSet.getInt("brand_package_id"), resultSet.getString("name_brand_package")));
                 seasonality.setCoefficient(resultSet.getDouble("coefficient"));
+
                 return seasonality;
             }
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed getById Seasonality");
         }
         return null;
     }
 
     public void deleteById(Integer id) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed deleteById Seasonality");
         }
     }
 
     public Integer create(Seasonality seasonality) throws DaoException {
-        try (Connection connection = PostgresUtils.getConnection();
+
+
+        ConnectionPool connectionPool = MySpecialContext.get();
+
+        try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, seasonality.getMonthNumber());
             preparedStatement.setInt(2, seasonality.getBrandPackage().getId());
             preparedStatement.setDouble(3, seasonality.getCoefficient());
+
             return preparedStatement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException throwables) {
+        } catch (SQLException throwables) {
             throw new DaoException("Failed create Seasonality");
         }
     }
