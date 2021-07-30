@@ -15,9 +15,9 @@ public class BrandPackageDao {
     private static final String DELETE_BY_ID = "delete from brand_package where id_brand_package = ?";
     private static final String INSERT_SQL = "insert into brand_package (name_brand_package) values ( ?)";
 
-    public List<BrandPackage> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+    public List<BrandPackage> findAll() throws DaoException {
 
         List<BrandPackage> brandPackages = new ArrayList<>();
 
@@ -40,8 +40,6 @@ public class BrandPackageDao {
 
     public BrandPackage getById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -62,8 +60,6 @@ public class BrandPackageDao {
 
     public void deleteById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -74,8 +70,6 @@ public class BrandPackageDao {
     }
 
     public Integer create(BrandPackage brandPackage) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {

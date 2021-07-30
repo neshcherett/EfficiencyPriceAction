@@ -31,9 +31,10 @@ public class SeasonalityDao {
     private static final String DELETE_BY_ID = "delete from seasonality where id_seasonality = ?";
     private static final String INSERT_SQL = "insert into seasonality (month, brand_package_id, coefficient) VALUES (?, ?, ?)";
 
-    public List<Seasonality> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+
+    public List<Seasonality> findAll() throws DaoException {
 
         List<Seasonality> seasonalities = new ArrayList<>();
 
@@ -58,8 +59,6 @@ public class SeasonalityDao {
 
     public Seasonality getById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -82,9 +81,6 @@ public class SeasonalityDao {
 
     public void deleteById(Integer id) throws DaoException {
 
-
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -95,9 +91,6 @@ public class SeasonalityDao {
     }
 
     public Integer create(Seasonality seasonality) throws DaoException {
-
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {

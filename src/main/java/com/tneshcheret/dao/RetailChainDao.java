@@ -33,9 +33,9 @@ public class RetailChainDao {
             "where id_retail_Chains = ?";
     private static final String DELETE_BY_ID = "delete from retail_chains where id_retail_Chains = ?";
 
-    public List<RetailChain> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+    public List<RetailChain> findAll() throws DaoException {
 
         List<RetailChain> retailChains = new ArrayList<>();
 
@@ -60,8 +60,6 @@ public class RetailChainDao {
 
     public Integer create(RetailChain retailChain) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, retailChain.getName());
@@ -75,8 +73,6 @@ public class RetailChainDao {
     }
 
     public RetailChain getById(Integer id) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
@@ -99,8 +95,6 @@ public class RetailChainDao {
     }
 
     public void deleteByID(Integer id) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {

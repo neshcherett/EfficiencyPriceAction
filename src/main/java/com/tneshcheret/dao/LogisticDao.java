@@ -40,9 +40,9 @@ public class LogisticDao {
 
     private static final String DELETE_BY_ID = "delete from logistic where id_logistic = ?";
 
-    public List<Logistic> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+    public List<Logistic> findAll() throws DaoException {
 
         List<Logistic> logistics = new ArrayList<>();
 
@@ -67,8 +67,6 @@ public class LogisticDao {
 
     public Logistic getById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -91,8 +89,6 @@ public class LogisticDao {
 
     public Integer create(Logistic logistic) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setInt(1, logistic.getRegion().getId());
@@ -106,8 +102,6 @@ public class LogisticDao {
     }
 
     public void deleteById(Integer id) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {

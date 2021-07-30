@@ -51,10 +51,9 @@ public class RequestActionDao {
 
     private static final String DELETE_BY_ID = "delete from request_action where id_request_action = ?";
 
+    ConnectionPool connectionPool = MySpecialContext.get();
 
     public RequestAction getById(User user) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_USER)) {
@@ -89,8 +88,6 @@ public class RequestActionDao {
 
     public RequestAction createOrUpdate(RequestAction requestAction) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         deleteRequestAction(requestAction);
 
         try {
@@ -119,8 +116,6 @@ public class RequestActionDao {
     }
 
     public void deleteRequestAction(RequestAction requestAction) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {

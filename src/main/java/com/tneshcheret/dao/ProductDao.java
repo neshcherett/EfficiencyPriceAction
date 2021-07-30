@@ -35,10 +35,9 @@ public class ProductDao {
             "where id_product = ?";
     private static final String DELETE_BY_ID = "delete from product where id_product = ?";
 
+    ConnectionPool connectionPool = MySpecialContext.get();
 
     public List<Product> findAll() throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         List<Product> products = new ArrayList<>();
 
@@ -65,8 +64,6 @@ public class ProductDao {
 
     public Integer create(Product product) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, product.getName());
@@ -81,8 +78,6 @@ public class ProductDao {
     }
 
     public Product getById(Integer id) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID)) {
@@ -107,8 +102,6 @@ public class ProductDao {
     }
 
     public void deleteByID(Integer id) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {

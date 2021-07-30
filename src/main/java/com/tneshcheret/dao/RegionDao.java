@@ -15,9 +15,9 @@ public class RegionDao {
     private static final String DELETE_BY_ID = "delete from region where id_region = ?";
     private static final String INSERT_SQL = "insert into region (name_region) values ( ?)";
 
-    public List<Region> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+    public List<Region> findAll() throws DaoException {
 
         List<Region> regions = new ArrayList<>();
 
@@ -40,8 +40,6 @@ public class RegionDao {
 
     public Region getById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -62,8 +60,6 @@ public class RegionDao {
 
     public void deleteById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -74,8 +70,6 @@ public class RegionDao {
     }
 
     public Integer create(Region region) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {

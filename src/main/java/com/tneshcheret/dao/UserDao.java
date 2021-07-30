@@ -16,9 +16,9 @@ public class UserDao {
     private static final String DELETE_BY_ID = "delete from \"user\" where id_user = ?";
     private static final String INSERT_SQL = "insert into \"user\" (login, password, user_role) values (?,?,?)";
 
-    public List<User> findAll() throws DaoException {
+    ConnectionPool connectionPool = MySpecialContext.get();
 
-        ConnectionPool connectionPool = MySpecialContext.get();
+    public List<User> findAll() throws DaoException {
 
         List<User> users = new ArrayList<>();
 
@@ -44,8 +44,6 @@ public class UserDao {
 
     public User getById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -67,8 +65,6 @@ public class UserDao {
     }
 
     public User getByLogin(String login) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_LOGIN)) {
@@ -92,8 +88,6 @@ public class UserDao {
 
     public void deleteById(Integer id) throws DaoException {
 
-        ConnectionPool connectionPool = MySpecialContext.get();
-
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID)) {
             preparedStatement.setInt(1, id);
@@ -104,8 +98,6 @@ public class UserDao {
     }
 
     public Integer create(User user) throws DaoException {
-
-        ConnectionPool connectionPool = MySpecialContext.get();
 
         try (Connection connection = connectionPool.get();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
